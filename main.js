@@ -61,6 +61,48 @@ app.get('/login', (req,res) => {
     res.render("login", {navLinks: navLinks})
 })
 
+app.post('/loggingin', async (req, res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+
+    const schema = Joi.object(
+        {
+            email: Joi.string().email({ tlds: { allow: false } }).required(),
+            password: Joi.string().max(20).required()
+        });
+
+    const validationResult = schema.validate({email,password});
+    if (validationResult.error != null) {
+        var error = validationResult.error.details[0].message;
+        res.render("login",{error:error,navLinks:navLinks});
+        return;
+    }
+
+    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1, user_type: 1 }).toArray();
+
+    console.log(result);
+    if (result.length != 1) {
+        console.log("user not found");
+        res.render("login",{error:"user not found",navLinks:navLinks});
+        return;
+    }
+    if (await bcrypt.compare(password, result[0].password)) {
+        console.log("correct password");
+        req.session.authenticated = true;
+        req.session.username = result[0].username;
+        req.session.cookie.maxAge = expireTime;
+        req.session.user_type = result[0].user_type
+
+        res.redirect('/home');
+        return;
+    }
+    else {
+        console.log("incorrect password");
+        res.render("login",{error:"pssword not found",navLinks: navLinks});
+        return;
+    }
+});
+
 app.get('/host', (req,res) => {
     res.render("host", {navLinks: navLinks})
 })
