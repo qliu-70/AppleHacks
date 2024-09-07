@@ -31,6 +31,13 @@ app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: false }));
 
+
+const navLinks = [
+    { name: 'Home', link: '/home' },
+    { name: 'Profile', link: '/profile' },
+    { name: 'Host', link: '/host' }
+];
+
 app.use(express.static('public'))
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`, crypto: {
@@ -47,11 +54,15 @@ app.use(session({
 ));
 
 app.get('/', (req, res) => {
-    res.render("index")
+    res.render("index", {navLinks: navLinks})
 });
 
 app.get('/login', (req,res) => {
-    res.render("login")
+    res.render("login", {navLinks: navLinks})
+})
+
+app.get('/host', (req,res) => {
+    res.render("host", {navLinks: navLinks})
 })
 
 app.post('/loggingin', async (req, res) => {
@@ -94,6 +105,13 @@ app.post('/loggingin', async (req, res) => {
         res.render("loggingin_wrongpass",{navLinks: navLinks});
         return;
     }
+});
+
+app.post('/host-book-club', (req, res) => {
+    const { btitle, bdescription, genres } = req.body;
+    const genreArray = genres.split(','); 
+
+    res.send("Book club hosted successfully.");
 });
 
 app.listen(port, () => {
