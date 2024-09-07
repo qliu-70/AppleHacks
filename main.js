@@ -80,11 +80,18 @@ app.post('/submitUser', async (req, res) => {
         res.render("signup", { error: error, navLinks: navLinks });
         return;
     }
+    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1}).toArray();
+    console.log(result)
+    if (result.length > 0) {
+        res.render("signup",{error:"user already exists",navLinks:navLinks})
+        return
+    }
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
     await userCollection.insertOne({ username: username, email: email, password: hashedPassword });
     console.log("Inserted user");
 
+    req.session.email = email;
     req.session.username = username;
     req.session.authenticated = true;
     req.session.cookie.maxAge = expireTime;
@@ -112,7 +119,7 @@ app.post('/loggingin', async (req, res) => {
         return;
     }
 
-    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1, user_type: 1 }).toArray();
+    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1}).toArray();
 
     console.log(result);
     if (result.length != 1) {
@@ -125,8 +132,7 @@ app.post('/loggingin', async (req, res) => {
         req.session.authenticated = true;
         req.session.username = result[0].username;
         req.session.cookie.maxAge = expireTime;
-        req.session.user_type = result[0].user_type
-
+        req.session.email = email;
         res.redirect('/home');
         return;
     }
