@@ -61,10 +61,6 @@ app.get('/login', (req,res) => {
     res.render("login", {navLinks: navLinks})
 })
 
-app.get('/host', (req,res) => {
-    res.render("host", {navLinks: navLinks})
-})
-
 app.post('/loggingin', async (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
@@ -78,7 +74,7 @@ app.post('/loggingin', async (req, res) => {
     const validationResult = schema.validate({email,password});
     if (validationResult.error != null) {
         var error = validationResult.error.details[0].message;
-        res.render("login",{error:error});
+        res.render("login",{error:error,navLinks:navLinks});
         return;
     }
 
@@ -87,7 +83,7 @@ app.post('/loggingin', async (req, res) => {
     console.log(result);
     if (result.length != 1) {
         console.log("user not found");
-        res.render("loggingin_notfound");
+        res.render("login",{error:"user not found",navLinks:navLinks});
         return;
     }
     if (await bcrypt.compare(password, result[0].password)) {
@@ -97,15 +93,19 @@ app.post('/loggingin', async (req, res) => {
         req.session.cookie.maxAge = expireTime;
         req.session.user_type = result[0].user_type
 
-        res.redirect('/members');
+        res.redirect('/home');
         return;
     }
     else {
         console.log("incorrect password");
-        res.render("loggingin_wrongpass",{navLinks: navLinks});
+        res.render("login",{error:"pssword not found",navLinks: navLinks});
         return;
     }
 });
+
+app.get('/host', (req,res) => {
+    res.render("host", {navLinks: navLinks})
+})
 
 app.post('/host-book-club', (req, res) => {
     const { btitle, bdescription, genres } = req.body;
