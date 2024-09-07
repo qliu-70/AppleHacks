@@ -103,6 +103,40 @@ app.post('/loggingin', async (req, res) => {
     }
 });
 
+app.get('/signup', (req,res) => {
+    res.render('signup',{navLinks:navLinks})
+})
+
+app.post('/submitUser', async (req, res) => {
+    var username = req.body.username;
+    var email = req.body.email;
+    var password = req.body.password;
+
+    const schema = Joi.object(
+        {
+            username: Joi.string().alphanum().max(20).required(),
+            email: Joi.string().email({ tlds: { allow: false } }).required(),
+            password: Joi.string().max(20).required()
+        });
+
+    const validationResult = schema.validate({ username, email, password });
+    if (validationResult.error != null) {
+        console.log(validationResult.error.details[0].path[0]);
+        var error = validationResult.error.details[0].message;
+        res.render("signup",{error: error, navLinks: navLinks});
+        return;
+    }
+    var hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    await userCollection.insertOne({ username: username, email: email, password: hashedPassword});
+    console.log("Inserted user");
+
+    req.session.username = username;
+    req.session.authenticated = true;
+    req.session.cookie.maxAge = expireTime;
+    res.redirect(`/profilesetup`);
+});
+
 app.get('/host', (req,res) => {
     res.render("host", {navLinks: navLinks})
 })
