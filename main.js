@@ -47,19 +47,7 @@ app.use(session({
 ));
 
 app.get('/', (req, res) => {
-    if (req.session.authenticated) {
-        var html = `
-        Hello, ${req.session.username}!
-        <a href="/members"><button>Go to Members Area</button></a>
-        <a href="/logout"><button>Logout</button></a>`
-    }
-    else {
-        var html = `
-        <a href="/signup"><button>Signup</button></a>
-        <a href="/login"><button>Login</button></a>`
-            ;
-    }
-    res.send(html);
+    res.render("index")
 });
 
 app.listen(port, () => {
