@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,16 +12,17 @@
 
 <body>
   <div class="container">
-    <header class="d-flex justify-content-center py-3" style="background-color: beige;">
+    <header class="d-flex justify-content-center py-4" style="background-color: beige; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
       <ul class="nav nav-pills">
         <% for(let i = 0; i < navLinks.length; i++) { %>
-          <li class="nav-item mx-2"> <!-- mx-2 adds horizontal margin between list items -->
-            <a class="nav-link active" aria-current="page" href="<%= navLinks[i].link %>">
+          <li class="nav-item mx-3">
+            <a class="nav-link" 
+               href="<%= navLinks[i].link %>"
+               style="border-radius: 5px; padding: 10px 15px; color: #333; font-weight: bold; background-color: transparent;">
               <%= navLinks[i].name %>
             </a>
           </li>
         <% } %>
       </ul>
     </header>
-
-  
+    <div class="container">

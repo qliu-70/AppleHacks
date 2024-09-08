@@ -1,6 +1,39 @@
 <%- include("templates/header", {navLinks: navLinks}) %>
-
-<h1> Hello, <%= username %></h1>
+  <!-- Welcome Section -->
+  <section class="text-center py-5">
+    <h1 class="display-4">Welcome back, <%= username %>!</h1>
+    <p class="lead">Ready to dive into a new book or connect with fellow readers?</p>
+    <div class="d-flex justify-content-center">
+      <a href="/join" class="btn btn-primary mx-2">Find a Book Club</a>
+      <a href="/host" class="btn btn-secondary mx-2">Host a Book Club</a>
+    </div>
+      <!-- Your Book Clubs -->
+  <section class="py-5">
+    <h2>Your Book Clubs</h2>
+    <% if (bookClubs.length > 0) { %>
+      <div class="row">
+        <% bookClubs.forEach(function(club) { %>
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title"><%= club.name %></h5>
+                <p class="card-text"><%= club.description %></p>
+                <a href="/club/<%= club.id %>" class="btn btn-outline-primary">View Club</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p>You’re not part of any book clubs yet. <a href="/join">Find one</a> or <a href="/host">host your own!</a></p>
+    <% } %>
+  </section>
+  </section>
+    <!-- Profile Settings -->
+    <section class="py-5 text-center">
+        <a href="/profile" class="btn btn-outline-dark">Manage Your Profile & Settings</a>
+      </section>
+    </div>
 
 
 <%- include("templates/footer") %>

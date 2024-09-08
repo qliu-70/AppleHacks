@@ -71,9 +71,10 @@ app.get('/', (req, res) => {
     res.render("index", { navLinks: navLinks })
 });
 
-app.get('/home', (req, res) => {
+app.get('/home', async (req, res) => {
     if (req.session.username) {
-        res.render('home', { username: req.session.username, navLinks: navLinks });
+        await const result = 
+        res.render('home', { username: req.session.username, navLinks: navLinks, bookClub,bookClub });
     } else {
         res.redirect('/login');
     }
