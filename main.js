@@ -341,6 +341,15 @@ app.post('/join-book-club', async (req, res) => {
     }
 });
 
+app.get('/logout', (req, res) => {
+    // Destroy the user session or perform logout operations
+    req.session.destroy((err) => {
+      if (err) {
+        return res.redirect('/'); // Handle error and redirect to the home page
+      }
+      res.redirect('/login'); // Redirect to the login page after logging out
+    });
+  });
 
 
 
