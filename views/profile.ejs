@@ -1,0 +1,199 @@
+<%- include("templates/header") %>
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <% if (typeof profilepic !== 'undefined' && profilepic) { %>
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                                alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                              <% } else { %>
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                                alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                              <% } %> 
+                            <h5 class="my-3"><%= username %></h5>
+                            <% if (typeof title !== 'undefined' && title) { %>
+                            <p class="text-muted mb-1"><%= title %></p>
+                            <% }  else { %>
+                                <p class="text-muted mb-4" style="visibility: hidden;">Some TITLE</p>
+                            <% }%>
+                            <div class="d-flex justify-content-center mb-2">
+                                <a href="/host"><button type="button" data-mdb-button-init data-mdb-ripple-init
+                                    class="btn btn-primary">host</button></a>
+                                <a href="/bookclubs"><button type="button" data-mdb-button-init data-mdb-ripple-init
+                                    class="btn btn-outline-primary ms-1">Join book club</button></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 mb-lg-0">
+                        <div class="card-body p-0">
+                          <ul class="list-group list-group-flush rounded-3">
+                            <!-- Title Row -->
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                              <i class="fas fa-globe fa-lg text-warning"></i>
+                              <p class="mb-0 fw-bold">Genres</p>
+                            </li>
+                            <!-- Genres Display as Buttons -->
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                              <div class="d-flex flex-wrap gap-2">
+                                <% if (typeof genres !== 'undefined' && genres && genres.length > 0) { %>
+                                  <% genres.forEach(function(genre, index) { %>
+                                    <% 
+                                      // Define a list of colors or a function to get color dynamically
+                                      var colors = ['btn-outline-primary', 'btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning'];
+                                      var colorClass = colors[index % colors.length];
+                                    %>
+                                    <button type="button" class="btn <%= colorClass %>"><%= genre %></button>
+                                  <% }); %>
+                                <% } else { %>
+                                  <button type="button" class="btn btn-outline-secondary" disabled>No genres available</button>
+                                  <button type="button" class="btn btn-outline-primary" onclick="window.location.href='/add-genres'">Add Genres</button>
+                                <% } %>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Full Name</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <% if (typeof fullname !== 'undefined' && fullname) { %>
+                                        <p class="mb-0"><%= fullname %></p>
+                                        <% } else {%>
+                                            <p class="text-muted mb-0">Full Name</p>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Email</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="mb-0"><%= email %></p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">City</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <% if (typeof city !== 'undefined' && city) { %>
+                                        <p class="mb-0"><%= city %></p>
+                                        <% } else {%>
+                                            <p class="text-muted mb-0">CITY</p>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Books Read</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <% if (typeof booksread !== 'undefined' && booksread) { %>
+                                        <p class="mb-0"><%= booksread %></p>
+                                        <% } else {%>
+                                            <p class="text-muted mb-0">0</p>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="d-flex justify-content-center mb-2">
+                                    <button type="button" class="btn btn-primary">EDIT</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-4 mb-md-0">
+                              <div class="card-body">
+                                <!-- Always Display Header -->
+                                <p class="mb-4">
+                                  <span class="text-primary font-italic me-1 fs-4">Favourite Book</span>
+                                </p>
+                          
+                                <% if (typeof favouritebook !== 'undefined' && favouritebook) { %>
+                                  <!-- Book Information -->
+                                  <p class="mb-1 fs-5 fw-bold">Title: <%= favouritebook.title || 'N/A' %></p>
+                                  <p class="mb-1 fs-5">Author: <%= favouritebook.author || 'N/A' %></p>
+                          
+                                  <!-- Genres List -->
+                                  <div class="mt-4">
+                                    <p class="mb-1 fs-5 fw-semibold">Genres:</p>
+                                    <% if (favouritebook.genres && favouritebook.genres.length > 0) { %>
+                                      <div class="d-flex flex-wrap gap-2">
+                                        <% favouritebook.genres.forEach(function(genre, index) { %>
+                                          <% 
+                                            // Define a list of colors or a function to get color dynamically
+                                            var colors = ['btn-outline-primary', 'btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning'];
+                                            var colorClass = colors[index % colors.length];
+                                          %>
+                                          <button type="button" class="btn <%= colorClass %> fs-6"><%= genre %></button>
+                                        <% }); %>
+                                      </div>
+                                    <% } else { %>
+                                      <button type="button" class="btn btn-outline-primary fs-6" onclick="window.location.href='/add-genres'">Add Genres</button>
+                                    <% } %>
+                                  </div>
+                                <% } else { %>
+                                  <!-- Book Information Placeholder if the book does not exist -->
+                                  <p class="fs-5 text-muted">No book information available.</p>
+                                <% } %>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="card mb-4 mb-md-0">
+                              <div class="card-body">
+                                <!-- Always Display Header -->
+                                <p class="mb-4">
+                                  <span class="text-primary font-italic me-1 fs-4">Currently Reading</span>
+                                </p>
+                          
+                                <% if (typeof reading !== 'undefined' && reading) { %>
+                                  <!-- Book Information -->
+                                  <p class="mb-1 fs-5 fw-bold">Title: <%= reading.title || 'N/A' %></p>
+                                  <p class="mb-1 fs-5">Author: <%= reading.author || 'N/A' %></p>
+                          
+                                  <!-- Genres List -->
+                                  <div class="mt-4">
+                                    <p class="mb-1 fs-5 fw-semibold">Genres:</p>
+                                    <% if (reading.genres && reading.genres.length > 0) { %>
+                                      <div class="d-flex flex-wrap gap-2">
+                                        <% reading.genres.forEach(function(genre, index) { %>
+                                          <% 
+                                            // Define a list of colors or a function to get color dynamically
+                                            var colors = ['btn-outline-primary', 'btn-outline-secondary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning'];
+                                            var colorClass = colors[index % colors.length];
+                                          %>
+                                          <button type="button" class="btn <%= colorClass %> fs-6"><%= genre %></button>
+                                        <% }); %>
+                                      </div>
+                                    <% } else { %>
+                                      <button type="button" class="btn btn-outline-primary fs-6" onclick="window.location.href='/add-genres'">Add Genres</button>
+                                    <% } %>
+                                  </div>
+                                <% } else { %>
+                                  <!-- Book Information Placeholder if the book does not exist -->
+                                  <p class="fs-5 text-muted">No book information available.</p>
+                                <% } %>
+                              </div>
+                            </div>
+                          </div>                          
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include("templates/footer") %>
