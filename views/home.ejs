@@ -1,4 +1,5 @@
 <%- include("templates/header", {navLinks: navLinks}) %>
+<div class="container" >
   <!-- Welcome Section -->
   <section class="text-center py-5">
     <h1 class="display-4">Welcome back, <%= username %>!</h1>
@@ -8,15 +9,16 @@
       <a href="/host" class="btn btn-secondary mx-2">Host a Book Club</a>
     </div>
       <!-- Your Book Clubs -->
-  <section class="py-5">
-    <h2>Your Book Clubs</h2>
+   <!-- Your Book Clubs -->
+   <section class="py-5" style="background-color: #faf3e6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 class="text-center mb-4" style="color: #5c4327;">Your Book Clubs</h2>
     <% if (bookClubs.length > 0) { %>
       <div class="row">
         <% bookClubs.forEach(function(club) { %>
-          <div class="col-md-4">
-            <div class="card mb-3">
+          <div class="col-md-4 mb-4">
+            <div class="card" style="background-color: #fff8e6;">
               <div class="card-body">
-                <h5 class="card-title"><%= club.name %></h5>
+                <h5 class="card-title" style="color: #5c4327;"><%= club.name %></h5>
                 <p class="card-text"><%= club.description %></p>
                 <a href="/club/<%= club.id %>" class="btn btn-outline-primary">View Club</a>
               </div>
@@ -25,7 +27,7 @@
         <% }) %>
       </div>
     <% } else { %>
-      <p>You’re not part of any book clubs yet. <a href="/join">Find one</a> or <a href="/host">host your own!</a></p>
+      <p class="text-center" style="color: #5c4327;">You’re not part of any book clubs yet. <a href="/join">Find one</a> or <a href="/host">host your own!</a></p>
     <% } %>
   </section>
   </section>
@@ -33,6 +35,7 @@
     <section class="py-5 text-center">
         <a href="/profile" class="btn btn-outline-dark">Manage Your Profile & Settings</a>
       </section>
+    </div>
     </div>
 
 
