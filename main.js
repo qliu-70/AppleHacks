@@ -223,23 +223,31 @@ app.post('/loggingin', async (req, res) => {
 });
 
 app.get('/profile', async (req, res) => {
-    var email = req.session.email
-    const result = await userCollection.find({ email: email }).project().toArray();
-    var username = req.session.username;
-    var profilepic = result[0].profilepic;
-    var fullname = result[0].fullname;
-    var city = result[0].city;
-    var genres = result[0].genre;
-    var favouritebook = result[0].favouritebook;
-    var reading = result[0].reading;
-    var booksread = result[0].booksfinished.length
-    var title = result[0].title
-    res.render('profile', { navLinks: navLinks, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email })
+    if(req.session.username) {
+        var email = req.session.email
+        const result = await userCollection.find({ email: email }).project().toArray();
+        var username = req.session.username;
+        var profilepic = result[0].profilepic;
+        var fullname = result[0].fullname;
+        var city = result[0].city;
+        var genres = result[0].genre;
+        var favouritebook = result[0].favouritebook;
+        var reading = result[0].reading;
+        var booksread = result[0].booksfinished.length
+        var title = result[0].title
+        res.render('profile', { navLinks: navLinks, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email })
+    } else {
+        res.redirect('login');
+    }
 })
 
 
 app.get('/host', (req, res) => {
-    res.render("host", { navLinks: navLinks })
+    if (req.session.username){
+        res.render("host", { navLinks: navLinks })
+    }  else {
+        res.redirect('login');
+    } 
 })
 
 app.post('/host-book-club', async (req, res) => {
@@ -264,7 +272,11 @@ app.post('/host-book-club', async (req, res) => {
 });
 
 app.get('/join', (req, res) => {
-    res.render("join", { navLinks: navLinks })
+    if (req.session.username) {
+        res.render("join", { navLinks: navLinks })
+    } else {
+        res.redirect('login')
+    }
 })
 
 app.get('/get-book-clubs', async (req, res) => {
