@@ -74,8 +74,12 @@ app.get('/', (req, res) => {
 
 app.get('/home', async (req, res) => {
     if (req.session.username) {
-        await const result = 
-        res.render('home', { username: req.session.username, navLinks: navLinks, bookClub,bookClub });
+        email = req.session.email;
+        const result = await bookClubCollection.find({
+            members: email
+        }).toArray();
+        bookclub = result;
+        res.render('home', { username: req.session.username, navLinks: navLinks, bookClubs: bookclub });
     } else {
         res.redirect('/login');
     }
@@ -134,12 +138,12 @@ app.get('/profilesetup', async (req, res) => {
     var reading = result[0].reading;
     var booksread = result[0].booksfinished.length;
     var title = result[0].title;
-    res.render('profilesetup', { navLinks: navLinks, popularGenres:popularGenres, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email });
+    res.render('profilesetup', { navLinks: navLinks, popularGenres: popularGenres, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email });
 })
 
 app.post('/update-profile', async (req, res) => {
     const email = req.session.email;  // Get the logged-in user's email from session
-    const { fullname, city} = req.body;
+    const { fullname, city } = req.body;
 
     await userCollection.updateOne(
         { email: email },
@@ -276,7 +280,7 @@ app.post('/host-book-club', async (req, res) => {
         genres: genreArray,
         host: req.session.username,
         createdAt: new Date(),
-        members:[email]
+        members: [email]
     };
 
     bookClubCollection.insertOne(bookClubDocument)
@@ -308,6 +312,7 @@ app.get('/get-book-clubs', async (req, res) => {
 app.post('/join-book-club', async (req, res) => {
     const { bookClubId } = req.body;
     const username = req.session.username;
+    const email = req.session.email;
 
     if (!bookClubId || !username) {
         console.error("Missing bookClubId or username.");
@@ -320,7 +325,7 @@ app.post('/join-book-club', async (req, res) => {
 
         const result = await bookClubCollection.updateOne(
             { _id: clubObjectId },
-            { $addToSet: { members: username } }
+            { $addToSet: { members: email } }
         );
 
         if (result.modifiedCount > 0) {
