@@ -90,15 +90,15 @@ app.post('/submitUser', async (req, res) => {
         res.render("signup", { error: error, navLinks: navLinks });
         return;
     }
-    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1}).toArray();
+    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1 }).toArray();
     console.log(result)
     if (result.length > 0) {
-        res.render("signup",{error:"user already exists",navLinks:navLinks})
+        res.render("signup", { error: "user already exists", navLinks: navLinks })
         return
     }
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({ username: username, email: email, password: hashedPassword });
+    await userCollection.insertOne({ username: username, email: email, password: hashedPassword, booksfinished: [] });
     console.log("Inserted user");
 
     req.session.email = email;
@@ -106,6 +106,75 @@ app.post('/submitUser', async (req, res) => {
     req.session.authenticated = true;
     req.session.cookie.maxAge = expireTime;
     res.redirect(`/profilesetup`);
+});
+
+app.get('/profilesetup', async (req, res) => {
+    var email = req.session.email
+    const result = await userCollection.find({ email: email }).project().toArray();
+    var username = req.session.username;
+    var profilepic = result[0].profilepic;
+    var fullname = result[0].fullname;
+    var city = result[0].city;
+    var genres = result[0].genre;
+    var favouritebook = result[0].favouritebook;
+    var reading = result[0].reading;
+    var booksread = result[0].booksfinished.length;
+    var title = result[0].title;
+    res.render('profilesetup', { navLinks: navLinks, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email });
+})
+
+app.post('/update-profile', async (req, res) => {
+    const email = req.session.email;  // Get the logged-in user's email from session
+    const { fullname, city, booksread } = req.body;
+
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { fullname: fullname, city: city} }
+    );
+
+    res.redirect('/profilesetup');  // Redirect back to profile setup page
+});
+
+// Route to handle favourite book updates
+app.post('/update-favourite-book', async (req, res) => {
+    const email = req.session.email;
+    const { title, author, genres } = req.body;
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { favouritebook: { title: title, author: author, genres: genres.split(',').map(g => g.trim()) } } }
+    );
+
+    res.redirect('/profilesetup');
+});
+
+// Route to handle currently reading book updates
+app.post('/update-currently-reading', async (req, res) => {
+    const email = req.session.email;
+    const { title, author, genres } = req.body;
+
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { reading: { title: title, author: author, genres: genres.split(',').map(g => g.trim()) } } }
+    );
+
+    res.redirect('/profilesetup');
+});
+
+app.post('/add-genres', async (req, res) => {
+    const email = req.session.email; // Grab the email from the session
+    const selectedGenres = req.body.genres;
+
+    if (!Array.isArray(selectedGenres)) {
+        return res.redirect('/profilesetup'); // Redirect if no genres are selected
+    }
+
+    // Add selected genres to the user's profile
+    await userCollection.updateOne(
+        { email: email },
+        { $addToSet: { genre: { $each: selectedGenres } } } // Add selected genres only if they don't already exist
+    );
+
+    res.redirect('/profilesetup');
 });
 
 app.get('/login', (req, res) => {
@@ -129,7 +198,7 @@ app.post('/loggingin', async (req, res) => {
         return;
     }
 
-    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1}).toArray();
+    const result = await userCollection.find({ email: email }).project({ username: 1, password: 1, email: 1, _id: 1 }).toArray();
 
     console.log(result);
     if (result.length != 1) {
@@ -153,20 +222,20 @@ app.post('/loggingin', async (req, res) => {
     }
 });
 
-app.get('/profile', async (req,res) => {
+app.get('/profile', async (req, res) => {
     var email = req.session.email
     const result = await userCollection.find({ email: email }).project().toArray();
     var username = req.session.username;
     var profilepic = result[0].profilepic;
     var fullname = result[0].fullname;
-    var city =  result[0].city;
+    var city = result[0].city;
     var genres = result[0].genre;
-    var favouritebook =result[0].favouritebook;
+    var favouritebook = result[0].favouritebook;
     var reading = result[0].reading;
-    var booksread =result[0].booksfinished.length
+    var booksread = result[0].booksfinished.length
     var title = result[0].title
-    res.render('profile',{navLinks:navLinks,username:username, profilepic:profilepic, city: city, fullname:fullname, genres:genres, favouritebook:favouritebook, reading:reading,booksread: booksread, title:title, email:email})
-} )
+    res.render('profile', { navLinks: navLinks, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email })
+})
 
 
 app.get('/host', (req, res) => {
@@ -181,17 +250,17 @@ app.post('/host-book-club', async (req, res) => {
         title: btitle,
         description: bdescription,
         genres: genreArray,
-        host: req.session.username, 
-        createdAt: new Date() 
+        host: req.session.username,
+        createdAt: new Date()
     };
 
     bookClubCollection.insertOne(bookClubDocument)
-    .then(result => {
-        res.status(200).send("Book club hosted successfully.");
-    })
-    .catch(err => {
-        res.status(500).send("Failed to host book club.");
-    });
+        .then(result => {
+            res.status(200).send("Book club hosted successfully.");
+        })
+        .catch(err => {
+            res.status(500).send("Failed to host book club.");
+        });
 });
 
 app.get('/join', (req, res) => {
