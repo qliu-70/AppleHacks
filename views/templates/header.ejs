@@ -11,14 +11,16 @@
 
 <body>
   <div class="container">
-    <header class="d-flex justify-content-center py-3">
+    <header class="d-flex justify-content-center py-3" style="background-color: beige;">
       <ul class="nav nav-pills">
-        <% for(let i=0; i < navLinks.length; i++){%>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="<%= navLinks[i].link%>">
-              <%= navLinks[i].name%>
+        <% for(let i = 0; i < navLinks.length; i++) { %>
+          <li class="nav-item mx-2"> <!-- mx-2 adds horizontal margin between list items -->
+            <a class="nav-link active" aria-current="page" href="<%= navLinks[i].link %>">
+              <%= navLinks[i].name %>
             </a>
           </li>
-          <% } %>
+        <% } %>
       </ul>
     </header>
+
+  

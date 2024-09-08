@@ -10,7 +10,7 @@ const saltRounds = 12;
 const app = express();
 const Joi = require("joi");
 const port = process.env.PORT || 3000;
-
+app.use(express.json());
 const expireTime = 1 * 60 * 60 * 1000; //expires after 1 hour  (hours * minutes * seconds * millis)
 
 /* secret information section */
@@ -265,13 +265,16 @@ app.get('/host', (req, res) => {
 app.post('/host-book-club', async (req, res) => {
     const { btitle, bdescription, genres } = req.body;
     const genreArray = genres.split(',').map(genre => genre.trim());
+    email = req.session.email;
+    username = req.session.username;
 
     const bookClubDocument = {
         title: btitle,
         description: bdescription,
         genres: genreArray,
         host: req.session.username,
-        createdAt: new Date()
+        createdAt: new Date(),
+        members:[email]
     };
 
     bookClubCollection.insertOne(bookClubDocument)
@@ -302,6 +305,7 @@ app.get('/get-book-clubs', async (req, res) => {
 
 app.post('/join-book-club', async (req, res) => {
     const { bookClubId } = req.body;
+    console.log({bookClubId})
     const username = req.session.username;
 
     try {
@@ -309,7 +313,7 @@ app.post('/join-book-club', async (req, res) => {
             { _id: new ObjectId(bookClubId) },
             { $addToSet: { members: username } }
         );
-
+        console.log(result);
         if (result.modifiedCount > 0) {
             res.status(200).send("Successfully joined the book club.");
         } else {

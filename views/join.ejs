@@ -20,7 +20,6 @@
             bookClubs.forEach(club => {
                 const card = document.createElement('div');
                 card.className = 'col-md-4 mb-3';
-
                 card.innerHTML = `
                     <div class="card">
                         <div class="card-body">
@@ -39,7 +38,6 @@
             document.querySelectorAll('.join-btn').forEach(button => {
                 button.addEventListener('click', async function() {
                     const bookClubId = this.getAttribute('data-id');
-
                     try {
                         const joinResponse = await fetch('/join-book-club', {
                             method: 'POST',
