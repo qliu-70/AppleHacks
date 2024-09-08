@@ -285,7 +285,7 @@ app.post('/host-book-club', async (req, res) => {
 
     bookClubCollection.insertOne(bookClubDocument)
         .then(result => {
-            res.status(200).send("Book club hosted successfully.");
+            res.render("hosted",{navLinks:navLinks});
         })
         .catch(err => {
             res.status(500).send("Failed to host book club.");
