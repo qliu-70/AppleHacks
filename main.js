@@ -40,6 +40,18 @@ const navLinks = [
     { name: 'Join Bookclub', link: '/join' }
 ];
 
+const popularGenres = ['Science Fiction', 'Fantasy', 'Mystery', 'Non-Fiction'
+    , 'Romance', "Literary Fiction",
+    "Historical Fiction",
+    "Contemporary Fiction",
+    "Thriller",
+    "Biography & Memoir",
+    "Classic Literature",
+    "Magical Realism",
+    "Young Adult",
+    "Crime",
+    "Poetry"]
+
 app.use(express.static('public'))
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`, crypto: {
@@ -63,7 +75,7 @@ app.get('/home', (req, res) => {
     if (req.session.username) {
         res.render('home', { username: req.session.username, navLinks: navLinks });
     } else {
-        res.redirect('/login'); 
+        res.redirect('/login');
     }
 });
 
@@ -120,16 +132,16 @@ app.get('/profilesetup', async (req, res) => {
     var reading = result[0].reading;
     var booksread = result[0].booksfinished.length;
     var title = result[0].title;
-    res.render('profilesetup', { navLinks: navLinks, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email });
+    res.render('profilesetup', { navLinks: navLinks, popularGenres:popularGenres, username: username, profilepic: profilepic, city: city, fullname: fullname, genres: genres, favouritebook: favouritebook, reading: reading, booksread: booksread, title: title, email: email });
 })
 
 app.post('/update-profile', async (req, res) => {
     const email = req.session.email;  // Get the logged-in user's email from session
-    const { fullname, city, booksread } = req.body;
+    const { fullname, city} = req.body;
 
     await userCollection.updateOne(
         { email: email },
-        { $set: { fullname: fullname, city: city} }
+        { $set: { fullname: fullname, city: city } }
     );
 
     res.redirect('/profilesetup');  // Redirect back to profile setup page
@@ -150,11 +162,11 @@ app.post('/update-favourite-book', async (req, res) => {
 // Route to handle currently reading book updates
 app.post('/update-currently-reading', async (req, res) => {
     const email = req.session.email;
-    const { title, author, genres } = req.body;
+    const { title, author, description } = req.body;
 
     await userCollection.updateOne(
         { email: email },
-        { $set: { reading: { title: title, author: author, genres: genres.split(',').map(g => g.trim()) } } }
+        { $set: { reading: { title: title, author: author, description: description } } }
     );
 
     res.redirect('/profilesetup');
@@ -223,7 +235,7 @@ app.post('/loggingin', async (req, res) => {
 });
 
 app.get('/profile', async (req, res) => {
-    if(req.session.username) {
+    if (req.session.username) {
         var email = req.session.email
         const result = await userCollection.find({ email: email }).project().toArray();
         var username = req.session.username;
@@ -243,11 +255,11 @@ app.get('/profile', async (req, res) => {
 
 
 app.get('/host', (req, res) => {
-    if (req.session.username){
+    if (req.session.username) {
         res.render("host", { navLinks: navLinks })
-    }  else {
+    } else {
         res.redirect('login');
-    } 
+    }
 })
 
 app.post('/host-book-club', async (req, res) => {
@@ -281,7 +293,7 @@ app.get('/join', (req, res) => {
 
 app.get('/get-book-clubs', async (req, res) => {
     try {
-        const bookClubs = await bookClubCollection.find({}).toArray(); 
+        const bookClubs = await bookClubCollection.find({}).toArray();
         res.status(200).json(bookClubs);
     } catch (err) {
         res.status(500).send("Failed to retrieve book clubs.");
@@ -290,12 +302,12 @@ app.get('/get-book-clubs', async (req, res) => {
 
 app.post('/join-book-club', async (req, res) => {
     const { bookClubId } = req.body;
-    const username = req.session.username; 
+    const username = req.session.username;
 
     try {
         const result = await bookClubCollection.updateOne(
             { _id: new ObjectId(bookClubId) },
-            { $addToSet: { members: username } } 
+            { $addToSet: { members: username } }
         );
 
         if (result.modifiedCount > 0) {
