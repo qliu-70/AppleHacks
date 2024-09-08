@@ -1,30 +1,37 @@
 <%- include("templates/header", {navLinks: navLinks}) %>
-<h1>Host a book club</h1>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Host a Book Club</h2>
+        <form method="POST" action="/host-book-club" id="hostForm">
+          <div class="mb-3">
+            <label for="btitle" class="form-label">Book Title</label>
+            <input type="text" class="form-control" id="btitle" name="btitle" required>
+          </div>
+          <div class="mb-3">
+            <label for="bdescription" class="form-label">Brief Description of This Book</label>
+            <textarea class="form-control" id="bdescription" name="bdescription" rows="5" required></textarea>
+          </div>
 
-<form method="POST" action="/host-book-club" id="hostForm">
-    <div class="mb-3">
-        <label for="btitle">Book title</label>
-        <input type="text" class="form-control" id="btitle" name="btitle" required>
-    </div>
-    <div class="mb-3">
-        <label for="bdescription">Brief description of this book</label>
-        <textarea class="form-control" id="bdescription" name="bdescription" rows="5" required></textarea>
-    </div>
+          <!-- Book Genre Tags Section -->
+          <div class="mb-3">
+            <label for="tags" class="form-label">Book Genres</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="tag-input" placeholder="Enter a genre and press Add">
+              <button type="button" id="add-tag" class="btn btn-outline-secondary">Add</button>
+            </div>
+            <div id="tags-container" class="mt-3">
+              <!-- Tags will be displayed here -->
+            </div>
+            <!-- Hidden input to store the tags as a comma-separated string -->
+            <input type="hidden" name="genres" id="genres">
+          </div>
 
-    <!-- Book Genre Tags Section -->
-    <div class="mb-3">
-        <label for="tags">Book Genres</label>
-        <input type="text" class="form-control" id="tag-input" placeholder="Enter a genre and press Add">
-        <button type="button" id="add-tag" class="btn btn-secondary mt-2">Add</button>
-        <div id="tags-container" class="mt-3">
-            <!-- Tags will be displayed here -->
-        </div>
-        <!-- Hidden input to store the tags as a comma-separated string -->
-        <input type="hidden" name="genres" id="genres">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
     </div>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  </div>
 
 <%- include("templates/footer") %>
 
