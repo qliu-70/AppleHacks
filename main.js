@@ -168,17 +168,19 @@ app.get('/host', (req, res) => {
     res.render("host", { navLinks: navLinks })
 })
 
-app.post('/host-book-club', (req, res) => {
+app.post('/host-book-club', async (req, res) => {
     const { btitle, bdescription, genres } = req.body;
+    const genreArray = genres.split(',').map(genre => genre.trim());
 
-    const genreArray = genres ? genres.split(',').map(genre => genre.trim()) : [];
-
-    // Store the book club data in MongoDB
-    userCollection.insertOne({
+    const bookClubDocument = {
         title: btitle,
         description: bdescription,
-        genres: genreArray
-    })
+        genres: genreArray,
+        host: req.session.username, 
+        createdAt: new Date() 
+    };
+
+    bookClubCollection.insertOne(bookClubDocument)
     .then(result => {
         res.status(200).send("Book club hosted successfully.");
     })
@@ -186,6 +188,7 @@ app.post('/host-book-club', (req, res) => {
         res.status(500).send("Failed to host book club.");
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Server is Running on port ${port}`);

@@ -1,7 +1,7 @@
 <%- include("templates/header", {navLinks: navLinks}) %>
 <h1>Host a book club</h1>
 
-<form method="POST" action="/submit-book-club" id="hostForm">
+<form method="POST" action="/host-book-club" id="hostForm">
     <div class="mb-3">
         <label for="btitle">Book title</label>
         <input type="text" class="form-control" id="btitle" name="btitle" required>
@@ -26,94 +26,57 @@
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
-<!-- Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">Success</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Book club hosted successfully!
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <%- include("templates/footer") %>
 
 <script>
+
     document.addEventListener('DOMContentLoaded', function() {
-        const addTagButton = document.getElementById('add-tag');
-        const tagInput = document.getElementById('tag-input');
-        const tagsContainer = document.getElementById('tags-container');
-        const genresInput = document.getElementById('genres');
-        const hostForm = document.getElementById('hostForm');
+    const addTagButton = document.getElementById('add-tag');
+    const tagInput = document.getElementById('tag-input');
+    const tagsContainer = document.getElementById('tags-container');
+    const genresInput = document.getElementById('genres');
+    const hostForm = document.getElementById('hostForm');
 
-        let tags = [];
+    let tags = [];
 
-        function updateTagsInput() {
-            genresInput.value = tags.join(',');
-        }
+    function updateTagsInput() {
+        genresInput.value = tags.join(',');
+    }
 
-        function createTagElement(tag) {
-            const tagElement = document.createElement('span');
-            tagElement.className = 'badge bg-secondary me-1';
-            tagElement.innerText = tag;
+    function createTagElement(tag) {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'badge bg-secondary me-1';
+        tagElement.innerText = tag;
 
-            const removeButton = document.createElement('span');
-            removeButton.className = 'ms-2 text-danger';
-            removeButton.style.cursor = 'pointer';
-            removeButton.innerHTML = '&times;';
-            removeButton.addEventListener('click', function() {
-                tags = tags.filter(t => t !== tag);
-                tagsContainer.removeChild(tagElement);
-                updateTagsInput();
-            });
-
-            tagElement.appendChild(removeButton);
-            return tagElement;
-        }
-
-        addTagButton.addEventListener('click', function() {
-            const tag = tagInput.value.trim();
-            if (tag && !tags.includes(tag)) {
-                tags.push(tag);
-
-                const tagElement = createTagElement(tag);
-                tagsContainer.appendChild(tagElement);
-
-                updateTagsInput();
-                tagInput.value = '';
-            }
+        const removeButton = document.createElement('span');
+        removeButton.className = 'ms-2 text-danger';
+        removeButton.style.cursor = 'pointer';
+        removeButton.innerHTML = '&times;';
+        removeButton.addEventListener('click', function() {
+            tags = tags.filter(t => t !== tag);
+            tagsContainer.removeChild(tagElement);
+            updateTagsInput();
         });
 
-        // Handle form submission
-        hostForm.addEventListener('submit', async function(event) {
-            event.preventDefault(); 
+        tagElement.appendChild(removeButton);
+        return tagElement;
+    }
 
-            const formData = new FormData(hostForm);
+    addTagButton.addEventListener('click', function() {
+        const tag = tagInput.value.trim();
+        if (tag && !tags.includes(tag)) {
+            tags.push(tag);
 
-            const response = await fetch('/host-book-club', {
-                method: 'POST',
-                body: formData
-            });
+            const tagElement = createTagElement(tag);
+            tagsContainer.appendChild(tagElement);
 
-            if (response.ok) {
-                // Show the success modal
-                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                successModal.show();
-                hostForm.reset();
-                tags = [];
-                tagsContainer.innerHTML = '';
-                updateTagsInput();
-            } else {
-                alert('There was an error hosting the book club.');
-            }
-        });
+            updateTagsInput();
+            tagInput.value = '';
+        }
     });
+
+    
+});
+
 </script>
