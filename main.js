@@ -26,6 +26,7 @@ const node_session_secret = process.env.NODE_SESSION_SECRET;
 var { database } = include('databaseconnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
+const bookClubCollection = database.db(mongodb_database).collection('bookclub');
 
 app.set('view engine', 'ejs');
 
@@ -54,6 +55,10 @@ app.use(session({
 ));
 
 app.get('/', (req, res) => {
+    res.render("index", { navLinks: navLinks })
+});
+
+app.get('/home', (req, res) => {
     res.render("index", { navLinks: navLinks })
 });
 
@@ -150,9 +155,21 @@ app.get('/host', (req, res) => {
 
 app.post('/host-book-club', (req, res) => {
     const { btitle, bdescription, genres } = req.body;
-    const genreArray = genres.split(',');
 
-    res.send("Book club hosted successfully.");
+    const genreArray = genres ? genres.split(',').map(genre => genre.trim()) : [];
+
+    // Store the book club data in MongoDB
+    userCollection.insertOne({
+        title: btitle,
+        description: bdescription,
+        genres: genreArray
+    })
+    .then(result => {
+        res.status(200).send("Book club hosted successfully.");
+    })
+    .catch(err => {
+        res.status(500).send("Failed to host book club.");
+    });
 });
 
 app.listen(port, () => {
