@@ -36,7 +36,8 @@ app.use(express.urlencoded({ extended: false }));
 const navLinks = [
     { name: 'Home', link: '/home' },
     { name: 'Profile', link: '/profile' },
-    { name: 'Host', link: '/host' }
+    { name: 'Host Bookclub', link: '/host' },
+    { name: 'Join Bookclub', link: '/join' }
 ];
 
 app.use(express.static('public'))
@@ -59,7 +60,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/home', (req, res) => {
-    res.render("index", { navLinks: navLinks })
+    if (req.session.username) {
+        res.render('home', { username: req.session.username, navLinks: navLinks });
+    } else {
+        res.redirect('/login'); 
+    }
 });
 
 app.get('/signup', (req, res) => {
@@ -187,6 +192,39 @@ app.post('/host-book-club', async (req, res) => {
     .catch(err => {
         res.status(500).send("Failed to host book club.");
     });
+});
+
+app.get('/join', (req, res) => {
+    res.render("join", { navLinks: navLinks })
+})
+
+app.get('/get-book-clubs', async (req, res) => {
+    try {
+        const bookClubs = await bookClubCollection.find({}).toArray(); 
+        res.status(200).json(bookClubs);
+    } catch (err) {
+        res.status(500).send("Failed to retrieve book clubs.");
+    }
+});
+
+app.post('/join-book-club', async (req, res) => {
+    const { bookClubId } = req.body;
+    const username = req.session.username; 
+
+    try {
+        const result = await bookClubCollection.updateOne(
+            { _id: new ObjectId(bookClubId) },
+            { $addToSet: { members: username } } 
+        );
+
+        if (result.modifiedCount > 0) {
+            res.status(200).send("Successfully joined the book club.");
+        } else {
+            res.status(400).send("You have already joined this book club.");
+        }
+    } catch (err) {
+        res.status(500).send("Failed to join the book club.");
+    }
 });
 
 

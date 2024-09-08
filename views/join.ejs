@@ -1,0 +1,70 @@
+<%- include("templates/header", {navLinks: navLinks}) %>
+
+<h1>Join a Book Club</h1>
+
+<div class="container">
+    <div class="row" id="bookClubsContainer">
+    </div>
+</div>
+
+<%- include("templates/footer") %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const bookClubsContainer = document.getElementById('bookClubsContainer');
+
+        try {
+            const response = await fetch('/get-book-clubs');
+            const bookClubs = await response.json();
+
+            bookClubs.forEach(club => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+
+                card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${club.title}</h5>
+                            <p class="card-text">${club.description}</p>
+                            <p class="card-text"><strong>Genres:</strong> ${club.genres.join(', ')}</p>
+                            <p class="card-text"><strong>Members Joined:</strong> ${club.members ? club.members.length : 0}</p>
+                            <button class="btn btn-primary join-btn" data-id="${club._id}">Join</button>
+                        </div>
+                    </div>
+                `;
+
+                bookClubsContainer.appendChild(card);
+            });
+
+            document.querySelectorAll('.join-btn').forEach(button => {
+                button.addEventListener('click', async function() {
+                    const bookClubId = this.getAttribute('data-id');
+
+                    try {
+                        const joinResponse = await fetch('/join-book-club', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ bookClubId })
+                        });
+
+                        if (joinResponse.ok) {
+                            alert('You have successfully joined the book club!');
+                            location.reload(); 
+                        } else {
+                            const errorMessage = await joinResponse.text();
+                            alert(errorMessage);
+                        }
+                    } catch (error) {
+                        console.error('Error joining book club:', error);
+                        alert('There was an error joining the book club.');
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error('Error fetching book clubs:', error);
+        }
+    });
+</script>
