@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
 const saltRounds = 12;
+const { ObjectId } = require('mongodb');
 
 const app = express();
 const Joi = require("joi");
@@ -306,24 +307,36 @@ app.get('/get-book-clubs', async (req, res) => {
 
 app.post('/join-book-club', async (req, res) => {
     const { bookClubId } = req.body;
-    console.log({bookClubId})
     const username = req.session.username;
 
+    if (!bookClubId || !username) {
+        console.error("Missing bookClubId or username.");
+        return res.status(400).send("Invalid request. Please provide a valid book club ID and ensure you are logged in.");
+    }
+
     try {
+        // Convert bookClubId to ObjectId
+        const clubObjectId = new ObjectId(bookClubId);
+
         const result = await bookClubCollection.updateOne(
-            { _id: new ObjectId(bookClubId) },
+            { _id: clubObjectId },
             { $addToSet: { members: username } }
         );
-        console.log(result);
+
         if (result.modifiedCount > 0) {
+            console.log(`User ${username} successfully joined the book club ${bookClubId}.`);
             res.status(200).send("Successfully joined the book club.");
         } else {
+            console.warn(`User ${username} already joined the book club ${bookClubId}.`);
             res.status(400).send("You have already joined this book club.");
         }
     } catch (err) {
+        console.error("Failed to join the book club:", err);
         res.status(500).send("Failed to join the book club.");
     }
 });
+
+
 
 
 app.listen(port, () => {
